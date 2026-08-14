@@ -103,6 +103,21 @@
         <div class="field full"><label>脂肪特征（可修改）</label>
           <input id="fat" value="内脏脂肪囤积较多">
         </div>
+        <div class="field full"><label>身体问题（可多选，自动生成风险提示）</label>
+          <div id="riskBox" style="display:flex; flex-wrap:wrap; gap:6px 14px; font-size:13px; padding:6px 2px;">
+            <label><input type="checkbox" name="risk" value="内分泌"> 月经不调/内分泌</label>
+            <label><input type="checkbox" name="risk" value="脂肪肝"> 脂肪肝/血脂血压</label>
+            <label><input type="checkbox" name="risk" value="便秘"> 便秘/肠道差</label>
+            <label><input type="checkbox" name="risk" value="熬夜"> 熬夜/睡眠差</label>
+            <label><input type="checkbox" name="risk" value="血糖"> 血糖偏高</label>
+            <label><input type="checkbox" name="risk" value="关节"> 关节/腰背负担</label>
+            <label><input type="checkbox" name="risk" value="多囊"> 产后/多囊</label>
+            <label><input type="checkbox" name="risk" value="其他"> 其他</label>
+          </div>
+        </div>
+        <div class="field full" id="riskOtherBox" style="display:none;"><label>其他身体问题（自定义）</label>
+          <input id="riskOther" placeholder="如：长期服药、痛风等">
+        </div>
       </div>
       <div class="btns">
         <button class="btn btn-copy" onclick="copyReport()">📋 复制报告文字</button>
@@ -123,6 +138,24 @@
 function num(id){ return parseFloat(document.getElementById(id).value) || 0; }
 function txt(id){ return document.getElementById(id).value.trim(); }
 
+// 身体问题 → 风险话术库（①脂肪特征 ②风险提示文案）
+const RISKS = {
+  '内分泌': {fat: '内分泌紊乱伴随肥胖', txt: '肥胖与内分泌互相影响：脂肪组织会干扰雌激素分泌，加重月经紊乱、排卵异常，长期还可能影响生育。您的代谢型肥胖不解决，内分泌问题只会越来越顽固——这就是为什么单纯调理月经效果反复，根源在体重。'},
+  '脂肪肝': {fat: '内脏脂肪堆积，伴有脂肪肝倾向', txt: '内脏脂肪是最危险的脂肪：它包裹着肝脏和脏器，直接导致脂肪肝，还会加重高血压、高血脂、心脑血管负担。每减1公斤体重，肝脏脂肪可减少约2%。您现在减，是把脂肪肝挡在门外；再拖3-5年，就是吃药控制的问题了。'},
+  '便秘': {fat: '代谢慢，肠道排毒不畅', txt: '便秘说明肠道蠕动和代谢功能在下降，毒素排不出去就会堆积在体内，加重肥胖、肤色暗沉。减重过程中我们同步调理肠道，排便通畅了，代谢才能打开，体重才会真正掉下来。'},
+  '熬夜': {fat: '熬夜作息紊乱，代谢机能下降', txt: '长期熬夜会降低基础代谢率，让脂肪更容易囤积在腰腹。肥胖反过来又会加重打鼾、睡眠呼吸暂停——睡觉都缺氧，心脑血管长期超负荷。您这种工作性质，体重控制住，睡眠质量都会改善。'},
+  '血糖': {fat: '糖代谢异常风险', txt: '肥胖是2型糖尿病的头号诱因：脂肪过多会阻碍胰岛素发挥作用。您现在只是血糖偏高，减掉15公斤后胰岛素敏感性会明显改善；继续胖下去，可能就是终身用药的开始。'},
+  '关节': {fat: '大体重压迫关节', txt: '每多1公斤体重，膝盖承受的压力就是3-4公斤。您现在体重偏大，膝盖和腰椎每天都在超负荷工作，上下楼梯、久站久走都会加速磨损。减重是最有效的"护关节"方式，越早减，关节越省。'},
+  '多囊': {fat: '产后代谢紊乱', txt: '产后体重滞留加上激素波动，容易发展成多囊卵巢综合征——表现为月经稀发、体毛加重、备孕困难。减重5%-10%就能明显改善排卵功能，这是目前医学上公认最有效的干预方式。'},
+  '其他': {fat: '', txt: ''}
+};
+
+function selectedRisks(){
+  const sel = [];
+  document.querySelectorAll('input[name="risk"]:checked').forEach(cb => sel.push(cb.value));
+  return sel;
+}
+
 function render(){
   const name = txt('name') || '客户';
   const sex = txt('sex');
@@ -130,7 +163,13 @@ function render(){
   const H = num('h'), W0 = num('w0');
   const C0 = num('c0'), Wst0 = num('wst0'), H0 = num('h0'), T0 = num('t0'), A0 = num('a0');
   const K = num('bmiK'), ADJ = num('adj');
-  const fat = txt('fat') || '内脏脂肪囤积较多';
+  const sel = selectedRisks();
+  const other = txt('riskOther');
+  let fat = txt('fat');
+  if(!fat || fat === '内脏脂肪囤积较多'){
+    if(sel.length) fat = RISKS[sel[0]].fat;
+    if(!fat) fat = '内脏脂肪囤积较多';
+  }
   const mgr = txt('mgr') || '健康管理师';
 
   const bmi = Math.round(W0 / Math.pow(H/100, 2) * 10) / 10;
@@ -152,7 +191,11 @@ function render(){
 
   const m2 = `身型评估：腰腹部/胯部分解偏多，胯部松垮，腰两侧及腹部臃肿，小腹突出，胯部松垮，臀线下移，导致臀宽下坠，腿部比例被严重压缩，四肢存在的多余脂肪，使整个身形趋于不协调状态。需调整围度：胸围：${C1}cm；腰围：${Wst1}cm；臀围：${H1}cm；大腿：${T1}cm；手臂围：${A1}cm。脂肪分解代谢之后，后背和副乳脂肪可以收紧，腰部两侧内缩，腹部收紧，臀线提升，使臀部曲线挺翘，臀线上移后使腿部比例拉伸，且腿部脂肪减掉后，大腿会更结实圆润，整体视觉效果会显得更加纤细修长。${name}分脂后，身高与体重、四肢与躯干能接近于黄金比例，整个体型会更加协调均匀，呈现健康曲线美。右侧为分脂后效果预览图。`;
 
-  const m3 = `健康分析结果：中焦脂肪分解代谢，可改善以及预防脂肪肝，高血压，心脑血管方面问题。同时对肝脾肾，肠道保养，可以提升自身健康指数，从而提升自己抵抗能力和免疫力，延缓衰老周期。`;
+  const base3 = `健康分析结果：中焦脂肪分解代谢，可改善以及预防脂肪肝，高血压，心脑血管方面问题。同时对肝脾肾，肠道保养，可以提升自身健康指数，从而提升自己抵抗能力和免疫力，延缓衰老周期。`;
+  const riskParts = [];
+  sel.forEach(r => { if(RISKS[r] && RISKS[r].txt) riskParts.push(RISKS[r].txt); });
+  if(sel.includes('其他') && other) riskParts.push(`其他：${other}，建议在减重过程中同步关注，具体情况可咨询专业人士。`);
+  const m3 = riskParts.length ? base3 + '\n\n【风险提示】' + riskParts.join('\n') : base3;
 
   document.getElementById('report').innerHTML = `
     <h3>分脂评估单</h3>
@@ -193,8 +236,21 @@ function fallbackCopy(text){
   alert('✅ 报告已复制，直接粘贴到微信发给客户即可！');
 }
 
-['name','sex','age','h','w0','c0','wst0','h0','t0','a0','bmiK','adj','mgr','fat']
+['name','sex','age','h','w0','c0','wst0','h0','t0','a0','bmiK','adj','mgr','fat','riskOther']
   .forEach(id => document.getElementById(id).addEventListener('input', render));
+
+// 身体问题勾选联动：显示"其他"输入框 + 自动填脂肪特征 + 重算
+document.querySelectorAll('input[name="risk"]').forEach(cb => {
+  cb.addEventListener('change', () => {
+    document.getElementById('riskOtherBox').style.display =
+      document.querySelector('input[name="risk"][value="其他"]').checked ? 'block' : 'none';
+    const sel = selectedRisks();
+    if(sel.length && (txt('fat') === '' || txt('fat') === '内脏脂肪囤积较多')){
+      document.getElementById('fat').value = RISKS[sel[0]].fat || '内脏脂肪囤积较多';
+    }
+    render();
+  });
+});
 
 render();
 </script>
