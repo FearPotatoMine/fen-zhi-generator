@@ -113,7 +113,8 @@
 
     <div class="panel">
       <h2>② 自动生成报告（实时预览）</h2>
-      <div class="report" id="report"></div>
+      <div class="note" style="margin-bottom:8px">✏️ 报告文字可<b>直接点击修改</b>（如加备注、改措辞），改完点「复制」或「打印」就是修改后的内容；重新填写左侧数据会恢复自动生成。</div>
+      <div class="report" id="report" contenteditable="true"></div>
     </div>
   </div>
 </div>
@@ -169,19 +170,19 @@ function render(){
     <div class="r-fine">此报告仅对本次分脂负责，结果仅对本人本次有效，仅供参考，如有问题及时联系体脂规划师</div>
     <div class="r-fine" style="text-align:center">第1页 共1页</div>
   `;
-
-  window.__report = {
-    header: `【分脂评估单】\n姓名：${name}｜性别：${sex}｜年龄：${age}｜身高：${H}cm｜体重：${W0}KG\n当前BMI：${bmi}（${state}）｜健康体重范围：${lb}~${ub}KG\n\n`,
-    m1, m2, m3
-  };
 }
 
 function copyReport(){
-  const r = window.__report;
-  if(!r){ return; }
-  const full = r.header + r.m1 + '\n\n' + r.m2 + '\n\n' + r.m3;
+  const rep = document.getElementById('report');
+  if(!rep || !rep.textContent.trim()){ return; }
+  const lines = [];
+  rep.querySelectorAll('h3, .r-head, .r-title, .r-text, .r-fine').forEach(el => {
+    const t = el.textContent.trim();
+    if(t) lines.push(t);
+  });
+  const full = lines.join('\n');
   if(navigator.clipboard){
-    navigator.clipboard.writeText(full).then(()=>alert('✅ 报告已复制，直接粘贴到微信发给客户即可！'))
+    navigator.clipboard.writeText(full).then(()=>alert('✅ 报告已复制（含您手动修改的内容），直接粘贴到微信发给客户即可！'))
       .catch(()=>fallbackCopy(full));
   } else { fallbackCopy(full); }
 }
