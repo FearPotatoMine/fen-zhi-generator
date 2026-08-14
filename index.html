@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>分脂评估单 · 自动生成器</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family:"Microsoft YaHei","微软雅黑","PingFang SC",sans-serif;
+    background:#eef2f7; color:#333; padding:16px;
+  }
+  .wrap { max-width:1100px; margin:0 auto; }
+  h1 {
+    text-align:center; color:#1F4E79; margin:10px 0 4px; font-size:24px;
+  }
+  .sub { text-align:center; color:#888; font-size:13px; margin-bottom:18px; }
+  .cols { display:flex; gap:20px; flex-wrap:wrap; }
+  .panel {
+    background:#fff; border-radius:10px; padding:18px 20px;
+    box-shadow:0 2px 8px rgba(0,0,0,.08); flex:1 1 380px;
+  }
+  .panel h2 {
+    font-size:16px; color:#1F4E79; border-left:4px solid #1F4E79;
+    padding-left:10px; margin-bottom:14px;
+  }
+  .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px 16px; }
+  .field label { display:block; font-size:12px; color:#666; margin-bottom:3px; }
+  .field input, .field select {
+    width:100%; padding:7px 9px; border:1px solid #ccc; border-radius:6px;
+    font-size:14px; background:#fffdf5; font-family:inherit;
+  }
+  .field input:focus { border-color:#1F4E79; outline:none; }
+  .full { grid-column:1 / -1; }
+  .note { font-size:11px; color:#999; margin-top:4px; }
+  .btns { display:flex; gap:10px; margin-top:16px; flex-wrap:wrap; }
+  .btn {
+    flex:1; padding:11px 0; border:none; border-radius:8px; cursor:pointer;
+    font-size:15px; font-family:inherit; color:#fff; font-weight:bold;
+  }
+  .btn-copy { background:#1F4E79; }
+  .btn-print { background:#2E9E5B; }
+  .btn:hover { opacity:.9; }
+  .report {
+    background:#fff; border:2px solid #1F4E79; border-radius:6px;
+    padding:22px 26px; margin-top:4px; line-height:1.85; font-size:14px;
+  }
+  .report h3 {
+    text-align:center; font-size:24px; color:#1F4E79; letter-spacing:8px;
+    margin-bottom:12px; border-bottom:2px solid #1F4E79; padding-bottom:8px;
+  }
+  .r-head { font-size:13px; color:#333; margin-bottom:2px; }
+  .r-title { font-weight:bold; margin:10px 0 4px; color:#1F4E79; font-size:15px; }
+  .r-text { text-align:justify; }
+  .r-fine { font-size:11px; color:#999; margin-top:6px; }
+  .tip {
+    background:#FFF7E6; border:1px solid #FFD591; color:#874D00;
+    padding:10px 14px; border-radius:8px; font-size:13px; margin-top:14px;
+  }
+  @media print {
+    body { background:#fff; padding:0; }
+    .form, .btns, .sub, .tip, h1 { display:none !important; }
+    .cols { display:block; }
+    .panel { box-shadow:none; padding:0; }
+    .report { border-color:#000; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>分脂评估单 · 自动生成器</h1>
+  <div class="sub">填写客户信息，右侧自动生成完整评估报告，可直接打印或截图发给客户</div>
+
+  <div class="cols">
+    <div class="panel form">
+      <h2>① 填写客户信息</h2>
+      <div class="form-grid">
+        <div class="field"><label>客户姓名</label><input id="name" value="杨月"></div>
+        <div class="field"><label>性别</label>
+          <select id="sex"><option>女</option><option>男</option></select>
+        </div>
+        <div class="field"><label>年龄（岁）</label><input id="age" type="number" value="34"></div>
+        <div class="field"><label>身高（cm）</label><input id="h" type="number" value="163"></div>
+        <div class="field"><label>体重（kg）</label><input id="w0" type="number" value="68"></div>
+        <div class="field"><label>胸围（cm）</label><input id="c0" type="number" value="93"></div>
+        <div class="field"><label>腰围（cm）</label><input id="wst0" type="number" value="88"></div>
+        <div class="field"><label>臀围（cm）</label><input id="h0" type="number" value="97"></div>
+        <div class="field"><label>大腿围（cm）</label><input id="t0" type="number" value="53"></div>
+        <div class="field"><label>手臂围（cm）</label><input id="a0" type="number" value="31"></div>
+        <div class="field"><label>目标 BMI（美体标准）</label>
+          <select id="bmiK">
+            <option value="19">19（偏瘦标准）</option>
+            <option value="20" selected>20（美体标准）</option>
+            <option value="21">21（标准）</option>
+          </select>
+        </div>
+        <div class="field"><label>目标体重微调（kg）</label><input id="adj" type="number" value="-0.6" step="0.1">
+          <div class="note">按年龄体质 ±1~2kg，默认 -0.6</div>
+        </div>
+        <div class="field"><label>健康管理师（报告签名）</label><input id="mgr" value="欧阳先生">
+          <div class="note">签名位置显示的老师名字</div>
+        </div>
+        <div class="field full"><label>脂肪特征（可修改）</label>
+          <input id="fat" value="内脏脂肪囤积较多">
+        </div>
+      </div>
+      <div class="btns">
+        <button class="btn btn-copy" onclick="copyReport()">📋 复制报告文字</button>
+        <button class="btn btn-print" onclick="window.print()">🖨️ 打印 / 存 PDF</button>
+      </div>
+      <div class="tip">💡 怎么发给客户：填好信息 → 点「复制报告文字」粘贴到微信，或点「打印」选"另存为PDF"发给客户，客户一眼看懂。</div>
+    </div>
+
+    <div class="panel">
+      <h2>② 自动生成报告（实时预览）</h2>
+      <div class="report" id="report"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+function num(id){ return parseFloat(document.getElementById(id).value) || 0; }
+function txt(id){ return document.getElementById(id).value.trim(); }
+
+function render(){
+  const name = txt('name') || '客户';
+  const sex = txt('sex');
+  const age = num('age');
+  const H = num('h'), W0 = num('w0');
+  const C0 = num('c0'), Wst0 = num('wst0'), H0 = num('h0'), T0 = num('t0'), A0 = num('a0');
+  const K = num('bmiK'), ADJ = num('adj');
+  const fat = txt('fat') || '内脏脂肪囤积较多';
+  const mgr = txt('mgr') || '健康管理师';
+
+  const bmi = Math.round(W0 / Math.pow(H/100, 2) * 10) / 10;
+  const state = bmi < 18.5 ? '偏瘦' : (bmi <= 23.9 ? '正常' : (bmi <= 27.9 ? '超重' : '肥胖'));
+  const lb = Math.round(Math.pow(H/100,2) * 18.5 * 10) / 10;
+  const ub = Math.round(Math.pow(H/100,2) * 23.9 * 10) / 10;
+  const W1 = Math.round(Math.pow(H/100,2) * K * 10) / 10 + ADJ;
+  const dW = Math.round((W0 - W1) * 10) / 10;
+  const C1 = Math.round(C0 - dW * 0.32);
+  const Wst1 = Math.round(Wst0 - dW * 1.3);
+  const H1 = C1;
+  const T1 = Math.round(T0 - dW * 0.387);
+  const A1 = Math.round(A0 - dW * 0.26);
+
+  const today = new Date();
+  const dateStr = today.getFullYear() + '.' + (today.getMonth()+1) + '.' + today.getDate();
+
+  const m1 = `分脂评估：原始数据：胸围${C0}，腰围${Wst0}，臀围${H0}，大腿${T0}，手臂${A0}，${fat}，易给脏器造成负担，结合年龄身高及前期反应，建议减重至${W1}KG。`;
+
+  const m2 = `身型评估：腰腹部/胯部分解偏多，胯部松垮，腰两侧及腹部臃肿，小腹突出，胯部松垮，臀线下移，导致臀宽下坠，腿部比例被严重压缩，四肢存在的多余脂肪，使整个身形趋于不协调状态。需调整围度：胸围：${C1}cm；腰围：${Wst1}cm；臀围：${H1}cm；大腿：${T1}cm；手臂围：${A1}cm。脂肪分解代谢之后，后背和副乳脂肪可以收紧，腰部两侧内缩，腹部收紧，臀线提升，使臀部曲线挺翘，臀线上移后使腿部比例拉伸，且腿部脂肪减掉后，大腿会更结实圆润，整体视觉效果会显得更加纤细修长。${name}分脂后，身高与体重、四肢与躯干能接近于黄金比例，整个体型会更加协调均匀，呈现健康曲线美。右侧为分脂后效果预览图。`;
+
+  const m3 = `健康分析结果：中焦脂肪分解代谢，可改善以及预防脂肪肝，高血压，心脑血管方面问题。同时对肝脾肾，肠道保养，可以提升自身健康指数，从而提升自己抵抗能力和免疫力，延缓衰老周期。`;
+
+  document.getElementById('report').innerHTML = `
+    <h3>分脂评估单</h3>
+    <div class="r-head">档案ID：<b>${dateStr.replace(/\./g,'')}${String(Math.floor(Math.random()*9000)+1000)}</b>　　申请健康管理师：${mgr}　　报告日期：${dateStr}</div>
+    <div class="r-head">姓名：<b>${name}</b>　　性别：${sex}　　年龄：${age}　　BMI范围：（18.5-23.9）</div>
+    <div class="r-head">身高：${H}cm　　体重：${W0}KG　　当前BMI：${bmi}（${state}）</div>
+    <div class="r-head">健康体重范围：${lb}~${ub}KG</div>
+    <div class="r-title">一、分脂评估</div>
+    <div class="r-text">${m1}</div>
+    <div class="r-title">二、身型评估</div>
+    <div class="r-text">${m2}</div>
+    <div class="r-title">三、健康分析结果</div>
+    <div class="r-text">${m3}</div>
+    <div class="r-head" style="margin-top:10px">体重管理中心　　　　　　签名：${mgr}　　报告日期：${dateStr}</div>
+    <div class="r-fine">此报告仅对本次分脂负责，结果仅对本人本次有效，仅供参考，如有问题及时联系体脂规划师</div>
+    <div class="r-fine" style="text-align:center">第1页 共1页</div>
+  `;
+
+  window.__report = {
+    header: `【分脂评估单】\n姓名：${name}｜性别：${sex}｜年龄：${age}｜身高：${H}cm｜体重：${W0}KG\n当前BMI：${bmi}（${state}）｜健康体重范围：${lb}~${ub}KG\n\n`,
+    m1, m2, m3
+  };
+}
+
+function copyReport(){
+  const r = window.__report;
+  if(!r){ return; }
+  const full = r.header + r.m1 + '\n\n' + r.m2 + '\n\n' + r.m3;
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(full).then(()=>alert('✅ 报告已复制，直接粘贴到微信发给客户即可！'))
+      .catch(()=>fallbackCopy(full));
+  } else { fallbackCopy(full); }
+}
+function fallbackCopy(text){
+  const ta = document.createElement('textarea');
+  ta.value = text; document.body.appendChild(ta); ta.select();
+  document.execCommand('copy'); document.body.removeChild(ta);
+  alert('✅ 报告已复制，直接粘贴到微信发给客户即可！');
+}
+
+['name','sex','age','h','w0','c0','wst0','h0','t0','a0','bmiK','adj','mgr','fat']
+  .forEach(id => document.getElementById(id).addEventListener('input', render));
+
+render();
+</script>
+</body>
+</html>
