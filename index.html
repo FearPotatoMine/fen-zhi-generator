@@ -100,6 +100,11 @@
         <div class="field"><label>健康管理师（报告签名）</label><input id="mgr" value="欧阳先生">
           <div class="note">签名位置显示的老师名字</div>
         </div>
+        <div class="field full"><label>客户瘦身前照片（可选，用于效果图对比）</label>
+          <input type="file" id="photo" accept="image/*" style="padding:5px; background:#fff;">
+          <div id="photoPreview" style="margin-top:6px;"></div>
+          <div class="note">上传正面全身照，效果图左侧会显示客户照片，右侧自动生成前后体型对比</div>
+        </div>
         <div class="field full"><label>脂肪特征（可修改）</label>
           <input id="fat" value="内脏脂肪囤积较多">
         </div>
@@ -197,6 +202,49 @@ function render(){
   if(sel.includes('其他') && other) riskParts.push(`其他：${other}，建议在减重过程中同步关注，具体情况可咨询专业人士。`);
   const m3 = riskParts.length ? base3 + '\n\n【风险提示】' + riskParts.join('\n') : base3;
 
+  // ===== 前后体型对比效果图（SVG 自动生成）=====
+  function silhouette(cx, chest, waist, hip, thigh, fill, stroke){
+    const s = chest*0.17, c = chest*0.20, w = waist*0.18, h = hip*0.20, t = thigh*0.22;
+    return `<path d="M ${cx},44
+      C ${cx-s},44 ${cx-c},64 ${cx-c},66
+      C ${cx-c},90 ${cx-w},116 ${cx-w},118
+      C ${cx-w},150 ${cx-h},168 ${cx-h},170
+      C ${cx-h},194 ${cx-t},208 ${cx-t},210
+      C ${cx-t},224 ${cx-7},234 ${cx-7},240
+      L ${cx+7},240
+      C ${cx+7},234 ${cx+t},224 ${cx+t},210
+      C ${cx+t},208 ${cx+h},194 ${cx+h},170
+      C ${cx+h},168 ${cx+w},150 ${cx+w},118
+      C ${cx+w},116 ${cx+c},90 ${cx+c},66
+      C ${cx+c},64 ${cx+s},44 ${cx},44 Z"
+      fill="${fill}" stroke="${stroke}" stroke-width="1.5"/>`;
+  }
+  function effectChart(){
+    const now = silhouette(70, C0, Wst0, H0, T0, 'rgba(220,80,80,.25)', '#C0504D');
+    const goal = silhouette(210, C1, Wst1, H1, T1, 'rgba(60,120,220,.25)', '#2E75B6');
+    const wa = Math.round((Wst0 - Wst1)*10)/10;
+    return `<div style="display:flex; gap:18px; align-items:center; flex-wrap:wrap; margin:6px 0 10px;">
+      <svg width="270" height="250" viewBox="0 0 270 250" style="background:#FAFBFC; border:1px solid #E0E0E0; border-radius:8px;">
+        <text x="70" y="18" text-anchor="middle" font-size="11" fill="#C0504D">当前体型</text>
+        ${now}
+        <text x="210" y="18" text-anchor="middle" font-size="11" fill="#2E75B6">建议效果</text>
+        ${goal}
+      </svg>
+      <div style="font-size:12px; line-height:2;">
+        <b style="color:#C0504D">● 当前：</b>胸围${C0}cm｜腰围${Wst0}cm｜臀围${H0}cm<br>
+        <b style="color:#2E75B6">● 效果：</b>胸围${C1}cm｜腰围${Wst1}cm｜臀围${H1}cm<br>
+        <b style="color:#C00000">▲ 重点变化：腰围 ${Wst0}cm → ${Wst1}cm（收${wa}cm）</b><br>
+        <span style="color:#888">（示意轮廓，仅供参考，实际效果因人而异）</span>
+      </div>
+    </div>`;
+  }
+  const effectArea = (window.__photo
+    ? `<div style="display:flex; gap:14px; align-items:center; flex-wrap:wrap; margin:8px 0 6px;">
+         <img src="${window.__photo}" alt="瘦身前照片" style="width:120px; max-height:250px; object-fit:cover; border:2px solid #C0504D; border-radius:8px;">
+         <div style="flex:1; min-width:200px;">${effectChart()}</div>
+       </div>`
+    : `<div style="margin:8px 0 6px;">${effectChart()}</div>`);
+
   document.getElementById('report').innerHTML = `
     <h3>分脂评估单</h3>
     <div class="r-head">档案ID：<b>${dateStr.replace(/\./g,'')}${String(Math.floor(Math.random()*9000)+1000)}</b>　　申请健康管理师：${mgr}　　报告日期：${dateStr}</div>
@@ -207,6 +255,8 @@ function render(){
     <div class="r-text">${m1}</div>
     <div class="r-title">二、身型评估</div>
     <div class="r-text">${m2}</div>
+    <div class="r-title">分脂后效果预览</div>
+    ${effectArea}
     <div class="r-title">三、健康分析结果</div>
     <div class="r-text">${m3}</div>
     <div style="position:relative;">
@@ -252,6 +302,20 @@ document.querySelectorAll('input[name="risk"]').forEach(cb => {
     }
     render();
   });
+});
+
+// 瘦身前照片上传
+document.getElementById('photo').addEventListener('change', e => {
+  const f = e.target.files && e.target.files[0];
+  if(!f) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    window.__photo = ev.target.result;
+    document.getElementById('photoPreview').innerHTML =
+      `<img src="${ev.target.result}" alt="瘦身前照片" style="width:90px; height:auto; border:1px solid #ccc; border-radius:6px;">`;
+    render();
+  };
+  reader.readAsDataURL(f);
 });
 
 render();
