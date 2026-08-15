@@ -245,29 +245,48 @@ function render(){
       C ${cx+c},64 ${cx+s},44 ${cx},44 Z`;
   }
   function effectChart(){
-    const cx = 110; // 同一位置重叠对比
+    const cx = 110;
     const wa = Math.round((Wst0 - Wst1)*10)/10;
     const nowD = silhouettePath(cx, C0, Wst0, H0, T0);
     const goalD = silhouettePath(cx, C1, Wst1, H1, T1);
     const wNow = Wst0*0.18, wGoal = Wst1*0.18;
-    const head = (fill, stroke) =>
-      `<g><circle cx="${cx}" cy="18" r="12" fill="${fill}" stroke="${stroke}" stroke-width="2"/><path d="M ${cx-5},30 L ${cx+5},30 L ${cx+4},44 L ${cx-4},44 Z" fill="${fill}" stroke="${stroke}" stroke-width="1.5"/></g>`;
+    const gradIdNow = 'gNow' + Math.floor(Math.random()*1e6);
+    const gradIdGoal = 'gGoal' + Math.floor(Math.random()*1e6);
     return `<div style="display:flex; gap:18px; align-items:center; flex-wrap:wrap; margin:6px 0 10px;">
       <div style="text-align:center;">
-        <svg width="240" height="270" viewBox="0 0 220 270" style="background:#FAFBFC; border:1px solid #E0E0E0; border-radius:8px;">
-          <text x="110" y="13" text-anchor="middle" font-size="11" fill="#666">当前体型 vs 建议效果（重叠对比）</text>
-          <path d="${nowD}" fill="rgba(220,80,80,.30)" stroke="#C0504D" stroke-width="1.5"/>
-          <path d="${goalD}" fill="none" stroke="#2E75B6" stroke-width="2.2" stroke-dasharray="4,3"/>
-          ${head('rgba(220,80,80,.30)','#C0504D')}
-          ${head('rgba(255,255,255,0)','#2E75B6')}
-          <line x1="${cx-wNow}" y1="118" x2="${cx+wNow}" y2="118" stroke="#C0504D" stroke-width="1.5"/>
-          <line x1="${cx-wGoal}" y1="150" x2="${cx+wGoal}" y2="150" stroke="#2E75B6" stroke-width="1.5"/>
-          <text x="16" y="114" font-size="10" fill="#C0504D">当前腰围 ${Wst0}cm</text>
-          <text x="16" y="146" font-size="10" fill="#2E75B6">建议腰围 ${Wst1}cm</text>
+        <svg width="250" height="280" viewBox="0 0 220 280" style="background:linear-gradient(180deg,#F7F9FC,#EDF1F7); border:1px solid #E0E0E0; border-radius:8px;">
+          <defs>
+            <linearGradient id="${gradIdNow}" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0" stop-color="#8E2424"/><stop offset="0.32" stop-color="#E57373"/>
+              <stop offset="0.68" stop-color="#C0504D"/><stop offset="1" stop-color="#7A1F1F"/>
+            </linearGradient>
+            <linearGradient id="${gradIdGoal}" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0" stop-color="#1F4E79"/><stop offset="0.32" stop-color="#5B9BD5"/>
+              <stop offset="0.68" stop-color="#2E75B6"/><stop offset="1" stop-color="#173F61"/>
+            </linearGradient>
+            <radialGradient id="headNow" cx="0.38" cy="0.32" r="0.9">
+              <stop offset="0" stop-color="#E57373"/><stop offset="1" stop-color="#8E2424"/>
+            </radialGradient>
+            <radialGradient id="headGoal" cx="0.38" cy="0.32" r="0.9">
+              <stop offset="0" stop-color="#7FB3E0"/><stop offset="1" stop-color="#1F4E79"/>
+            </radialGradient>
+          </defs>
+          <text x="110" y="14" text-anchor="middle" font-size="11" fill="#666">当前体型 vs 建议效果（立体对比）</text>
+          <ellipse cx="110" cy="252" rx="46" ry="7" fill="rgba(0,0,0,.12)"/>
+          <path d="${nowD}" fill="url(#${gradIdNow})" stroke="#8E2424" stroke-width="1.5"/>
+          <path d="${nowD}" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="3" transform="translate(-7,0)"/>
+          <path d="${goalD}" fill="url(#${gradIdGoal})" opacity="0.85" stroke="#173F61" stroke-width="1.5"/>
+          <path d="${goalD}" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="3" transform="translate(-6,0)"/>
+          <circle cx="${cx}" cy="18" r="12" fill="url(#headNow)"/>
+          <circle cx="${cx}" cy="18" r="12" fill="url(#headGoal)" opacity="0.9"/>
+          <line x1="${cx-wNow}" y1="118" x2="${cx+wNow}" y2="118" stroke="#8E2424" stroke-width="1.5"/>
+          <line x1="${cx-wGoal}" y1="150" x2="${cx+wGoal}" y2="150" stroke="#173F61" stroke-width="1.5"/>
+          <text x="14" y="114" font-size="10" fill="#C0504D">当前腰围 ${Wst0}cm</text>
+          <text x="14" y="146" font-size="10" fill="#2E75B6">建议腰围 ${Wst1}cm</text>
           <path d="M ${cx+wGoal+4},118 L ${cx+wGoal+14},118 L ${cx+wGoal+14},150 L ${cx+wGoal+4},150" fill="none" stroke="#999" stroke-width="1"/>
         </svg>
         <div style="font-size:11px; color:#C0504D; margin-top:4px;">■ 当前体型</div>
-        <div style="font-size:11px; color:#2E75B6;">┈ 建议效果（虚线）</div>
+        <div style="font-size:11px; color:#2E75B6;">■ 建议效果</div>
       </div>
       <div style="font-size:12px; line-height:2;">
         <b style="color:#C0504D">● 当前：</b>胸围${C0}cm｜腰围${Wst0}cm｜臀围${H0}cm<br>
@@ -279,7 +298,7 @@ function render(){
   }
   // 照片叠加效果器：客户照片为底图，叠加当前/建议体型轮廓线（支持滑杆调节对齐）
   function photoOverlayChart(){
-    const cx = 100; // viewBox 200x300 中心
+    const cx = 100;
     const nowD = silhouettePath(cx, C0, Wst0, H0, T0);
     const goalD = silhouettePath(cx, C1, Wst1, H1, T1);
     const wNow = Wst0*0.18, wGoal = Wst1*0.18;
@@ -288,27 +307,50 @@ function render(){
     const oy = window.__ovY || 0;
     const ox = window.__ovX || 0;
     const tf = `translate(${ox},${oy}) translate(100,150) scale(${sc}) translate(-100,-150)`;
+    const gN = 'oNow' + Math.floor(Math.random()*1e6);
+    const gG = 'oGoal' + Math.floor(Math.random()*1e6);
+    const gHN = 'hNow' + Math.floor(Math.random()*1e6);
+    const gHG = 'hGoal' + Math.floor(Math.random()*1e6);
     return `<div style="display:flex; gap:14px; align-items:center; flex-wrap:wrap; margin:8px 0 6px;">
-      <div style="position:relative; display:inline-block; width:200px; flex-shrink:0;">
+      <div style="position:relative; display:inline-block; width:210px; flex-shrink:0;">
         <img src="${window.__photo}" alt="瘦身前照片" style="width:100%; max-height:320px; object-fit:cover; border:2px solid #C0504D; border-radius:8px;">
-        <svg viewBox="0 0 200 300" preserveAspectRatio="xMidYMid meet" style="position:absolute; inset:0; width:100%; height:100%; opacity:.82; pointer-events:none;">
+        <svg viewBox="0 0 200 300" preserveAspectRatio="xMidYMid meet" style="position:absolute; inset:0; width:100%; height:100%; opacity:.85; pointer-events:none;">
+          <defs>
+            <linearGradient id="${gN}" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0" stop-color="#8E2424"/><stop offset="0.32" stop-color="#E57373"/>
+              <stop offset="0.68" stop-color="#C0504D"/><stop offset="1" stop-color="#7A1F1F"/>
+            </linearGradient>
+            <linearGradient id="${gG}" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0" stop-color="#1F4E79"/><stop offset="0.32" stop-color="#5B9BD5"/>
+              <stop offset="0.68" stop-color="#2E75B6"/><stop offset="1" stop-color="#173F61"/>
+            </linearGradient>
+            <radialGradient id="${gHN}" cx="0.38" cy="0.32" r="0.9">
+              <stop offset="0" stop-color="#E57373"/><stop offset="1" stop-color="#8E2424"/>
+            </radialGradient>
+            <radialGradient id="${gHG}" cx="0.38" cy="0.32" r="0.9">
+              <stop offset="0" stop-color="#7FB3E0"/><stop offset="1" stop-color="#1F4E79"/>
+            </radialGradient>
+          </defs>
           <g transform="${tf}">
-            <path d="${nowD}" fill="rgba(220,80,80,.16)" stroke="#C0504D" stroke-width="2"/>
-            <path d="${goalD}" fill="none" stroke="#2E75B6" stroke-width="2.6" stroke-dasharray="5,4"/>
-            <circle cx="${cx}" cy="18" r="12" fill="rgba(220,80,80,.16)" stroke="#C0504D" stroke-width="2"/>
-            <circle cx="${cx}" cy="18" r="12" fill="none" stroke="#2E75B6" stroke-width="2" stroke-dasharray="4,3"/>
-            <line x1="${cx-wNow}" y1="118" x2="${cx+wNow}" y2="118" stroke="#C0504D" stroke-width="1.5"/>
-            <line x1="${cx-wGoal}" y1="150" x2="${cx+wGoal}" y2="150" stroke="#2E75B6" stroke-width="1.5"/>
-            <text x="6" y="114" font-size="11" fill="#C0504D">当前腰围 ${Wst0}cm</text>
-            <text x="6" y="146" font-size="11" fill="#2E75B6">建议腰围 ${Wst1}cm</text>
+            <ellipse cx="${cx}" cy="252" rx="40" ry="6" fill="rgba(0,0,0,.15)"/>
+            <path d="${nowD}" fill="url(#${gN})"/>
+            <path d="${nowD}" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="3" transform="translate(-6,0)"/>
+            <path d="${goalD}" fill="url(#${gG})" opacity="0.9"/>
+            <path d="${goalD}" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="3" transform="translate(-5,0)"/>
+            <circle cx="${cx}" cy="18" r="12" fill="url(#${gHN})"/>
+            <circle cx="${cx}" cy="18" r="12" fill="url(#${gHG})" opacity="0.9"/>
+            <line x1="${cx-wNow}" y1="118" x2="${cx+wNow}" y2="118" stroke="#8E2424" stroke-width="1.5"/>
+            <line x1="${cx-wGoal}" y1="150" x2="${cx+wGoal}" y2="150" stroke="#173F61" stroke-width="1.5"/>
+            <text x="6" y="114" font-size="11" fill="#8E2424">当前腰围 ${Wst0}cm</text>
+            <text x="6" y="146" font-size="11" fill="#173F61">建议腰围 ${Wst1}cm</text>
           </g>
         </svg>
       </div>
       <div style="flex:1; min-width:170px; font-size:12px; line-height:2;">
-        <b style="color:#C0504D">■ 红色实线 = 当前体型</b><br>
-        <b style="color:#2E75B6">┈ 蓝色虚线 = 建议效果</b><br>
+        <b style="color:#C0504D">■ 红色立体 = 当前体型</b><br>
+        <b style="color:#2E75B6">■ 蓝色立体 = 建议效果</b><br>
         <b style="color:#C00000">▲ 重点变化：腰围 ${Wst0}cm → ${Wst1}cm（收${wa}cm）</b><br>
-        <span style="color:#888">（轮廓为示意叠加，可在左侧拖动滑杆对齐，仅供参考）</span>
+        <span style="color:#888">（立体示意，可在左侧拖动滑杆对齐，仅供参考）</span>
       </div>
     </div>`;
   }
