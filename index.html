@@ -103,12 +103,7 @@
         <div class="field full"><label>客户瘦身前照片（可选，用于效果图对比）</label>
           <input type="file" id="photo" accept="image/*" style="padding:5px; background:#fff;">
           <div id="photoPreview" style="margin-top:6px;"></div>
-          <div class="note">上传客户原照</div>
-        </div>
-        <div class="field full"><label>瘦身后效果照片（可选，真实照片前后对比）</label>
-          <input type="file" id="photoAfter" accept="image/*" style="padding:5px; background:#fff;">
-          <div id="photoAfterPreview" style="margin-top:6px;"></div>
-          <div class="note">用美图秀秀/醒图"美体瘦身"处理客户照片后上传，效果区即显示【瘦身前→瘦身后】真实对比</div>
+          <div class="note">上传客户原照，效果图自动生成【当前体型 vs 建议效果】对比</div>
         </div>
         <div class="field full"><label>脂肪特征（可修改）</label>
           <input id="fat" value="内脏脂肪囤积较多">
@@ -256,28 +251,9 @@ function render(){
       </div>
     </div>`;
   }
-  const wa2 = Math.round((Wst0 - Wst1)*10)/10;
-  // 三种展示模式：①真实照片前后对比 ②只有瘦前照+剪影 ③纯剪影
+  // 效果图：上传瘦前照片 → 照片 + 自动效果图；未上传 → 纯效果图
   let effectArea;
-  if(window.__photo && window.__photoAfter){
-    effectArea = `<div style="margin:8px 0 6px;">
-      <div style="display:flex; gap:12px; align-items:flex-end; justify-content:center; flex-wrap:wrap;">
-        <div style="text-align:center;">
-          <img src="${window.__photo}" alt="瘦身前" style="width:130px; max-height:260px; object-fit:cover; border:2px solid #C0504D; border-radius:8px;">
-          <div style="font-size:12px; color:#C0504D; margin-top:4px; font-weight:bold;">瘦身前</div>
-        </div>
-        <div style="font-size:26px; color:#2E75B6; padding-bottom:60px;">→</div>
-        <div style="text-align:center;">
-          <img src="${window.__photoAfter}" alt="瘦身后效果" style="width:130px; max-height:260px; object-fit:cover; border:2px solid #2E75B6; border-radius:8px;">
-          <div style="font-size:12px; color:#2E75B6; margin-top:4px; font-weight:bold;">瘦身后效果</div>
-        </div>
-      </div>
-      <div style="font-size:12px; text-align:center; margin-top:8px; line-height:1.9;">
-        <b style="color:#C00000">▲ 重点变化：腰围 ${Wst0}cm → ${Wst1}cm（收${wa2}cm）</b><br>
-        <span style="color:#888">（效果照片由瘦身工具处理生成，仅供参考，实际效果因人而异）</span>
-      </div>
-    </div>`;
-  } else if(window.__photo){
+  if(window.__photo){
     effectArea = `<div style="display:flex; gap:14px; align-items:center; flex-wrap:wrap; margin:8px 0 6px;">
          <img src="${window.__photo}" alt="瘦身前照片" style="width:120px; max-height:250px; object-fit:cover; border:2px solid #C0504D; border-radius:8px;">
          <div style="flex:1; min-width:200px;">${effectChart()}</div>
@@ -354,20 +330,6 @@ document.getElementById('photo').addEventListener('change', e => {
     window.__photo = ev.target.result;
     document.getElementById('photoPreview').innerHTML =
       `<img src="${ev.target.result}" alt="瘦身前照片" style="width:90px; height:auto; border:1px solid #ccc; border-radius:6px;">`;
-    render();
-  };
-  reader.readAsDataURL(f);
-});
-
-// 瘦身后照片上传
-document.getElementById('photoAfter').addEventListener('change', e => {
-  const f = e.target.files && e.target.files[0];
-  if(!f) return;
-  const reader = new FileReader();
-  reader.onload = ev => {
-    window.__photoAfter = ev.target.result;
-    document.getElementById('photoAfterPreview').innerHTML =
-      `<img src="${ev.target.result}" alt="瘦身后效果" style="width:90px; height:auto; border:1px solid #2E75B6; border-radius:6px;">`;
     render();
   };
   reader.readAsDataURL(f);
