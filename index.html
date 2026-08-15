@@ -10,16 +10,21 @@
     font-family:"Microsoft YaHei","微软雅黑","PingFang SC",sans-serif;
     background:#eef2f7; color:#333; padding:16px;
   }
-  .wrap { max-width:1100px; margin:0 auto; }
+  .wrap { max-width:1200px; margin:0 auto; }
   h1 {
     text-align:center; color:#1F4E79; margin:10px 0 4px; font-size:24px;
   }
-  .sub { text-align:center; color:#888; font-size:13px; margin-bottom:18px; }
-  .cols { display:flex; gap:20px; flex-wrap:wrap; }
+  .sub { text-align:center; color:#888; font-size:13px; margin-bottom:14px; }
+  .cols { display:flex; gap:20px; flex-wrap:wrap; align-items:flex-start; }
   .panel {
     background:#fff; border-radius:10px; padding:18px 20px;
-    box-shadow:0 2px 8px rgba(0,0,0,.08); flex:1 1 380px;
+    box-shadow:0 2px 8px rgba(0,0,0,.08);
   }
+  .panel.form { flex:0 0 330px; }
+  .panel.report-panel { flex:1 1 520px; min-width:0; }
+  body.full-report .panel.form { display:none; }
+  body.full-report .cols { display:block; }
+  body.full-report .panel.report-panel { width:100%; }
   .panel h2 {
     font-size:16px; color:#1F4E79; border-left:4px solid #1F4E79;
     padding-left:10px; margin-bottom:14px;
@@ -70,6 +75,9 @@
 <div class="wrap">
   <h1>分脂评估单 · 自动生成器</h1>
   <div class="sub">填写客户信息，右侧自动生成完整评估报告，可直接打印或截图发给客户</div>
+  <div style="text-align:center; margin-bottom:14px;">
+    <button onclick="toggleFull()" id="fullBtn" style="padding:8px 22px; border:none; border-radius:8px; background:#1F4E79; color:#fff; font-size:14px; cursor:pointer; font-family:inherit;">📐 报告全宽（方便完整截图）</button>
+  </div>
 
   <div class="cols">
     <div class="panel form">
@@ -149,7 +157,7 @@
       <div class="tip">💡 怎么发给客户：填好信息 → 点「复制报告文字」粘贴到微信，或点「打印」选"另存为PDF"发给客户，客户一眼看懂。</div>
     </div>
 
-    <div class="panel">
+    <div class="panel report-panel">
       <h2>② 自动生成报告（实时预览）</h2>
       <div class="note" style="margin-bottom:8px">✏️ 报告文字可<b>直接点击修改</b>（如加备注、改措辞），改完点「复制」或「打印」就是修改后的内容；重新填写左侧数据会恢复自动生成。</div>
       <div class="report" id="report" contenteditable="true"></div>
@@ -333,6 +341,11 @@ function render(){
     <div class="r-fine">此报告仅对本次分脂负责，结果仅对本人本次有效，仅供参考，如有问题及时联系体脂规划师</div>
     <div class="r-fine" style="text-align:center">第1页 共1页</div>
   `;
+}
+
+function toggleFull(){
+  const on = document.body.classList.toggle('full-report');
+  document.getElementById('fullBtn').textContent = on ? '🔄 恢复双栏' : '📐 报告全宽（方便完整截图）';
 }
 
 function copyReport(){
