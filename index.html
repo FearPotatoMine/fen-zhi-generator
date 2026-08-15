@@ -252,9 +252,9 @@ function render(){
     const wNow = Wst0*0.18, wGoal = Wst1*0.18;
     const gradIdNow = 'gNow' + Math.floor(Math.random()*1e6);
     const gradIdGoal = 'gGoal' + Math.floor(Math.random()*1e6);
-    return `<div style="display:flex; gap:18px; align-items:center; flex-wrap:wrap; margin:6px 0 10px;">
+    return `<div style="display:flex; gap:18px; align-items:center; justify-content:center; flex-wrap:wrap; margin:8px 0 10px;">
       <div style="text-align:center;">
-        <svg width="250" height="280" viewBox="0 0 220 280" style="background:linear-gradient(180deg,#F7F9FC,#EDF1F7); border:1px solid #E0E0E0; border-radius:8px;">
+        <svg width="270" height="300" viewBox="0 0 220 280" style="background:linear-gradient(180deg,#F7F9FC,#EDF1F7); border:1px solid #E0E0E0; border-radius:8px;">
           <defs>
             <linearGradient id="${gradIdNow}" x1="0" y1="0" x2="1" y2="0">
               <stop offset="0" stop-color="#8E2424"/><stop offset="0.32" stop-color="#E57373"/>
@@ -311,9 +311,9 @@ function render(){
     const gG = 'oGoal' + Math.floor(Math.random()*1e6);
     const gHN = 'hNow' + Math.floor(Math.random()*1e6);
     const gHG = 'hGoal' + Math.floor(Math.random()*1e6);
-    return `<div style="display:flex; gap:14px; align-items:center; flex-wrap:wrap; margin:8px 0 6px;">
-      <div style="position:relative; display:inline-block; width:210px; flex-shrink:0;">
-        <img src="${window.__photo}" alt="瘦身前照片" style="width:100%; max-height:320px; object-fit:cover; border:2px solid #C0504D; border-radius:8px;">
+    return `<div style="text-align:center; margin:8px 0 6px;">
+      <div style="position:relative; display:inline-block; width:230px;">
+        <img src="${window.__photo}" alt="瘦身前照片" style="width:100%; max-height:340px; object-fit:cover; border:2px solid #C0504D; border-radius:8px; display:block; margin:0 auto;">
         <svg viewBox="0 0 200 300" preserveAspectRatio="xMidYMid meet" style="position:absolute; inset:0; width:100%; height:100%; opacity:.85; pointer-events:none;">
           <defs>
             <linearGradient id="${gN}" x1="0" y1="0" x2="1" y2="0">
@@ -346,8 +346,8 @@ function render(){
           </g>
         </svg>
       </div>
-      <div style="flex:1; min-width:170px; font-size:12px; line-height:2;">
-        <b style="color:#C0504D">■ 红色立体 = 当前体型</b><br>
+      <div style="font-size:12px; line-height:2; text-align:center; margin-top:8px;">
+        <b style="color:#C0504D">■ 红色立体 = 当前体型</b>&nbsp;&nbsp;&nbsp;
         <b style="color:#2E75B6">■ 蓝色立体 = 建议效果</b><br>
         <b style="color:#C00000">▲ 重点变化：腰围 ${Wst0}cm → ${Wst1}cm（收${wa}cm）</b><br>
         <span style="color:#888">（立体示意，可在左侧拖动滑杆对齐，仅供参考）</span>
