@@ -251,13 +251,39 @@ function render(){
       </div>
     </div>`;
   }
-  // 效果图：上传瘦前照片 → 照片 + 自动效果图；未上传 → 纯效果图
+  // 照片叠加效果器：客户照片为底图，叠加当前/建议体型轮廓线
+  function photoOverlayChart(){
+    const cx = 100; // viewBox 200x300 中心
+    const nowD = silhouettePath(cx, C0, Wst0, H0, T0);
+    const goalD = silhouettePath(cx, C1, Wst1, H1, T1);
+    const wNow = Wst0*0.18, wGoal = Wst1*0.18;
+    const wa = Math.round((Wst0 - Wst1)*10)/10;
+    return `<div style="display:flex; gap:14px; align-items:center; flex-wrap:wrap; margin:8px 0 6px;">
+      <div style="position:relative; display:inline-block; width:200px; flex-shrink:0;">
+        <img src="${window.__photo}" alt="瘦身前照片" style="width:100%; max-height:320px; object-fit:cover; border:2px solid #C0504D; border-radius:8px;">
+        <svg viewBox="0 0 200 300" preserveAspectRatio="xMidYMid meet" style="position:absolute; inset:0; width:100%; height:100%; opacity:.82; pointer-events:none;">
+          <path d="${nowD}" fill="rgba(220,80,80,.16)" stroke="#C0504D" stroke-width="2"/>
+          <path d="${goalD}" fill="none" stroke="#2E75B6" stroke-width="2.6" stroke-dasharray="5,4"/>
+          <circle cx="${cx}" cy="18" r="12" fill="rgba(220,80,80,.16)" stroke="#C0504D" stroke-width="2"/>
+          <circle cx="${cx}" cy="18" r="12" fill="none" stroke="#2E75B6" stroke-width="2" stroke-dasharray="4,3"/>
+          <line x1="${cx-wNow}" y1="118" x2="${cx+wNow}" y2="118" stroke="#C0504D" stroke-width="1.5"/>
+          <line x1="${cx-wGoal}" y1="150" x2="${cx+wGoal}" y2="150" stroke="#2E75B6" stroke-width="1.5"/>
+          <text x="6" y="114" font-size="11" fill="#C0504D">当前腰围 ${Wst0}cm</text>
+          <text x="6" y="146" font-size="11" fill="#2E75B6">建议腰围 ${Wst1}cm</text>
+        </svg>
+      </div>
+      <div style="flex:1; min-width:170px; font-size:12px; line-height:2;">
+        <b style="color:#C0504D">■ 红色实线 = 当前体型</b><br>
+        <b style="color:#2E75B6">┈ 蓝色虚线 = 建议效果</b><br>
+        <b style="color:#C00000">▲ 重点变化：腰围 ${Wst0}cm → ${Wst1}cm（收${wa}cm）</b><br>
+        <span style="color:#888">（轮廓为示意叠加，仅供参考，实际效果因人而异）</span>
+      </div>
+    </div>`;
+  }
+  // 效果图：上传瘦前照片 → 照片叠加轮廓；未上传 → 纯剪影对比
   let effectArea;
   if(window.__photo){
-    effectArea = `<div style="display:flex; gap:14px; align-items:center; flex-wrap:wrap; margin:8px 0 6px;">
-         <img src="${window.__photo}" alt="瘦身前照片" style="width:120px; max-height:250px; object-fit:cover; border:2px solid #C0504D; border-radius:8px;">
-         <div style="flex:1; min-width:200px;">${effectChart()}</div>
-       </div>`;
+    effectArea = photoOverlayChart();
   } else {
     effectArea = `<div style="margin:8px 0 6px;">${effectChart()}</div>`;
   }
