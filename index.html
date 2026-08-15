@@ -254,7 +254,7 @@ function render(){
     const gradIdGoal = 'gGoal' + Math.floor(Math.random()*1e6);
     return `<div style="display:flex; gap:18px; align-items:center; justify-content:center; flex-wrap:wrap; margin:8px 0 10px;">
       <div style="text-align:center;">
-        <svg width="270" height="300" viewBox="0 0 220 280" style="background:linear-gradient(180deg,#F7F9FC,#EDF1F7); border:1px solid #E0E0E0; border-radius:8px;">
+        <svg width="270" height="310" viewBox="0 0 220 300" style="background:linear-gradient(180deg,#F7F9FC,#EDF1F7); border:1px solid #E0E0E0; border-radius:8px;">
           <defs>
             <linearGradient id="${gradIdNow}" x1="0" y1="0" x2="1" y2="0">
               <stop offset="0" stop-color="#8E2424"/><stop offset="0.32" stop-color="#E57373"/>
@@ -271,19 +271,21 @@ function render(){
               <stop offset="0" stop-color="#7FB3E0"/><stop offset="1" stop-color="#1F4E79"/>
             </radialGradient>
           </defs>
-          <text x="110" y="14" text-anchor="middle" font-size="11" fill="#666">当前体型 vs 建议效果（立体对比）</text>
-          <ellipse cx="110" cy="252" rx="46" ry="7" fill="rgba(0,0,0,.12)"/>
-          <path d="${nowD}" fill="url(#${gradIdNow})" stroke="#8E2424" stroke-width="1.5"/>
-          <path d="${nowD}" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="3" transform="translate(-7,0)"/>
-          <path d="${goalD}" fill="url(#${gradIdGoal})" opacity="0.85" stroke="#173F61" stroke-width="1.5"/>
-          <path d="${goalD}" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="3" transform="translate(-6,0)"/>
-          <circle cx="${cx}" cy="18" r="12" fill="url(#headNow)"/>
-          <circle cx="${cx}" cy="18" r="12" fill="url(#headGoal)" opacity="0.9"/>
-          <line x1="${cx-wNow}" y1="118" x2="${cx+wNow}" y2="118" stroke="#8E2424" stroke-width="1.5"/>
-          <line x1="${cx-wGoal}" y1="150" x2="${cx+wGoal}" y2="150" stroke="#173F61" stroke-width="1.5"/>
-          <text x="14" y="114" font-size="10" fill="#C0504D">当前腰围 ${Wst0}cm</text>
-          <text x="14" y="146" font-size="10" fill="#2E75B6">建议腰围 ${Wst1}cm</text>
-          <path d="M ${cx+wGoal+4},118 L ${cx+wGoal+14},118 L ${cx+wGoal+14},150 L ${cx+wGoal+4},150" fill="none" stroke="#999" stroke-width="1"/>
+          <text x="110" y="15" text-anchor="middle" font-size="11" fill="#666">当前体型 vs 建议效果（立体对比）</text>
+          <g transform="translate(0,24)">
+            <ellipse cx="110" cy="252" rx="46" ry="7" fill="rgba(0,0,0,.12)"/>
+            <path d="${nowD}" fill="url(#${gradIdNow})" stroke="#8E2424" stroke-width="1.5"/>
+            <path d="${nowD}" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="3" transform="translate(-7,0)"/>
+            <path d="${goalD}" fill="url(#${gradIdGoal})" opacity="0.85" stroke="#173F61" stroke-width="1.5"/>
+            <path d="${goalD}" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="3" transform="translate(-6,0)"/>
+            <circle cx="${cx}" cy="18" r="12" fill="url(#headNow)"/>
+            <circle cx="${cx}" cy="18" r="12" fill="url(#headGoal)" opacity="0.9"/>
+            <line x1="${cx-wNow}" y1="118" x2="${cx+wNow}" y2="118" stroke="#8E2424" stroke-width="1.5"/>
+            <line x1="${cx-wGoal}" y1="150" x2="${cx+wGoal}" y2="150" stroke="#173F61" stroke-width="1.5"/>
+            <text x="14" y="114" font-size="10" fill="#C0504D">当前腰围 ${Wst0}cm</text>
+            <text x="14" y="146" font-size="10" fill="#2E75B6">建议腰围 ${Wst1}cm</text>
+            <path d="M ${cx+wGoal+4},118 L ${cx+wGoal+14},118 L ${cx+wGoal+14},150 L ${cx+wGoal+4},150" fill="none" stroke="#999" stroke-width="1"/>
+          </g>
         </svg>
         <div style="font-size:11px; color:#C0504D; margin-top:4px;">■ 当前体型</div>
         <div style="font-size:11px; color:#2E75B6;">■ 建议效果</div>
@@ -306,7 +308,7 @@ function render(){
     const sc = (window.__ovScale || 100)/100;
     const oy = window.__ovY || 0;
     const ox = window.__ovX || 0;
-    const tf = `translate(${ox},${oy}) translate(100,150) scale(${sc}) translate(-100,-150)`;
+    const tf = `translate(0,10) translate(${ox},${oy}) translate(100,150) scale(${sc}) translate(-100,-150)`;
     const gN = 'oNow' + Math.floor(Math.random()*1e6);
     const gG = 'oGoal' + Math.floor(Math.random()*1e6);
     const gHN = 'hNow' + Math.floor(Math.random()*1e6);
