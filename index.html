@@ -203,9 +203,9 @@ function render(){
   const m3 = riskParts.length ? base3 + '\n\n【风险提示】' + riskParts.join('\n') : base3;
 
   // ===== 前后体型对比效果图（SVG 自动生成）=====
-  function silhouette(cx, chest, waist, hip, thigh, fill, stroke){
+  function silhouettePath(cx, chest, waist, hip, thigh){
     const s = chest*0.17, c = chest*0.20, w = waist*0.18, h = hip*0.20, t = thigh*0.22;
-    return `<path d="M ${cx},44
+    return `M ${cx},44
       C ${cx-s},44 ${cx-c},64 ${cx-c},66
       C ${cx-c},90 ${cx-w},116 ${cx-w},118
       C ${cx-w},150 ${cx-h},168 ${cx-h},170
@@ -216,20 +216,33 @@ function render(){
       C ${cx+t},208 ${cx+h},194 ${cx+h},170
       C ${cx+h},168 ${cx+w},150 ${cx+w},118
       C ${cx+w},116 ${cx+c},90 ${cx+c},66
-      C ${cx+c},64 ${cx+s},44 ${cx},44 Z"
-      fill="${fill}" stroke="${stroke}" stroke-width="1.5"/>`;
+      C ${cx+c},64 ${cx+s},44 ${cx},44 Z`;
   }
   function effectChart(){
-    const now = silhouette(70, C0, Wst0, H0, T0, 'rgba(220,80,80,.25)', '#C0504D');
-    const goal = silhouette(210, C1, Wst1, H1, T1, 'rgba(60,120,220,.25)', '#2E75B6');
+    const cx = 110; // 同一位置重叠对比
     const wa = Math.round((Wst0 - Wst1)*10)/10;
+    const nowD = silhouettePath(cx, C0, Wst0, H0, T0);
+    const goalD = silhouettePath(cx, C1, Wst1, H1, T1);
+    const wNow = Wst0*0.18, wGoal = Wst1*0.18;
+    const head = (fill, stroke) =>
+      `<g><circle cx="${cx}" cy="18" r="12" fill="${fill}" stroke="${stroke}" stroke-width="2"/><path d="M ${cx-5},30 L ${cx+5},30 L ${cx+4},44 L ${cx-4},44 Z" fill="${fill}" stroke="${stroke}" stroke-width="1.5"/></g>`;
     return `<div style="display:flex; gap:18px; align-items:center; flex-wrap:wrap; margin:6px 0 10px;">
-      <svg width="270" height="250" viewBox="0 0 270 250" style="background:#FAFBFC; border:1px solid #E0E0E0; border-radius:8px;">
-        <text x="70" y="18" text-anchor="middle" font-size="11" fill="#C0504D">当前体型</text>
-        ${now}
-        <text x="210" y="18" text-anchor="middle" font-size="11" fill="#2E75B6">建议效果</text>
-        ${goal}
-      </svg>
+      <div style="text-align:center;">
+        <svg width="240" height="270" viewBox="0 0 220 270" style="background:#FAFBFC; border:1px solid #E0E0E0; border-radius:8px;">
+          <text x="110" y="13" text-anchor="middle" font-size="11" fill="#666">当前体型 vs 建议效果（重叠对比）</text>
+          <path d="${nowD}" fill="rgba(220,80,80,.30)" stroke="#C0504D" stroke-width="1.5"/>
+          <path d="${goalD}" fill="none" stroke="#2E75B6" stroke-width="2.2" stroke-dasharray="4,3"/>
+          ${head('rgba(220,80,80,.30)','#C0504D')}
+          ${head('rgba(255,255,255,0)','#2E75B6')}
+          <line x1="${cx-wNow}" y1="118" x2="${cx+wNow}" y2="118" stroke="#C0504D" stroke-width="1.5"/>
+          <line x1="${cx-wGoal}" y1="150" x2="${cx+wGoal}" y2="150" stroke="#2E75B6" stroke-width="1.5"/>
+          <text x="16" y="114" font-size="10" fill="#C0504D">当前腰围 ${Wst0}cm</text>
+          <text x="16" y="146" font-size="10" fill="#2E75B6">建议腰围 ${Wst1}cm</text>
+          <path d="M ${cx+wGoal+4},118 L ${cx+wGoal+14},118 L ${cx+wGoal+14},150 L ${cx+wGoal+4},150" fill="none" stroke="#999" stroke-width="1"/>
+        </svg>
+        <div style="font-size:11px; color:#C0504D; margin-top:4px;">■ 当前体型</div>
+        <div style="font-size:11px; color:#2E75B6;">┈ 建议效果（虚线）</div>
+      </div>
       <div style="font-size:12px; line-height:2;">
         <b style="color:#C0504D">● 当前：</b>胸围${C0}cm｜腰围${Wst0}cm｜臀围${H0}cm<br>
         <b style="color:#2E75B6">● 效果：</b>胸围${C1}cm｜腰围${Wst1}cm｜臀围${H1}cm<br>
